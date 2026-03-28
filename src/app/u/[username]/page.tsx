@@ -141,7 +141,7 @@ const PublicProfilePage = () => {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ecfeff,#fff7ed_50%,#ffffff_100%)] font-sans">
-      <div className="relative mx-auto w-full max-w-6xl px-6 py-12">
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -left-24 top-10 h-56 w-56 rounded-full bg-emerald-200/50 blur-3xl" />
           <div className="absolute right-0 top-24 h-64 w-64 rounded-full bg-amber-200/60 blur-3xl" />
@@ -169,7 +169,7 @@ const PublicProfilePage = () => {
                 <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
                   Anonymous drop box
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                   <Avatar size="lg">
                     <AvatarImage
                       src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(
@@ -180,7 +180,7 @@ const PublicProfilePage = () => {
                     <AvatarFallback>{getInitials(username || "MU")}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <CardTitle className="font-heading text-3xl text-slate-900 sm:text-4xl">
+                    <CardTitle className="font-heading text-2xl text-slate-900 sm:text-4xl">
                       Send a message to {profileLabel}
                     </CardTitle>
                     <CardDescription className="text-slate-600">
@@ -219,11 +219,11 @@ const PublicProfilePage = () => {
                       )}
                     />
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                       <Button
                         type="submit"
                         disabled={isSending}
-                        className="rounded-full bg-slate-900 px-5 text-white hover:bg-slate-800"
+                        className="w-full rounded-full bg-slate-900 px-5 text-white hover:bg-slate-800 sm:w-auto"
                       >
                         {isSending ? (
                           <>
@@ -239,7 +239,7 @@ const PublicProfilePage = () => {
                         type="button"
                         variant="outline"
                         onClick={() => form.reset({ content: "" })}
-                        className="rounded-full border-emerald-200 bg-white/90"
+                        className="w-full rounded-full border-emerald-200 bg-white/90 sm:w-auto"
                         disabled={isSending}
                       >
                         Clear
@@ -283,7 +283,7 @@ const PublicProfilePage = () => {
                 variant="outline"
                 onClick={handleSuggestMessages}
                 disabled={isSuggesting}
-                className="rounded-full border-emerald-200 bg-white/90"
+                className="w-full rounded-full border-emerald-200 bg-white/90 sm:w-auto"
               >
                 {isSuggesting ? (
                   <>

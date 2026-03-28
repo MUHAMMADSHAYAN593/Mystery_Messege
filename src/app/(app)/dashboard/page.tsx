@@ -182,7 +182,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,#ecfeff,#fff7ed_50%,#ffffff_100%)] font-sans">
-      <div className="relative mx-auto w-full max-w-6xl px-6 py-12">
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -left-24 top-10 h-56 w-56 rounded-full bg-emerald-200/50 blur-3xl" />
           <div className="absolute right-0 top-24 h-64 w-64 rounded-full bg-amber-200/60 blur-3xl" />
