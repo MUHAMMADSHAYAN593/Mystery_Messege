@@ -11,6 +11,11 @@ const defaultSuggestions = [
 const openrouter = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer":
+      process.env.NEXTAUTH_URL || "https://feedbackappnextjs-pearl.vercel.app",
+    "X-Title": "Mystery Messege",
+  },
 })
 
 export async function POST() {
@@ -27,39 +32,66 @@ export async function POST() {
 
     const model =
       process.env.OPENROUTER_MODEL || "meta-llama/llama-3.2-3b-instruct:free"
+    const fallbackModels = [
+      "mistralai/mistral-7b-instruct:free",
+      "google/gemma-2-9b-it:free",
+      "qwen/qwen-2.5-7b-instruct:free",
+    ]
+    const modelsToTry = [...new Set([model, ...fallbackModels])]
 
-    const completion = await openrouter.chat.completions.create({
-      model,
-      temperature: 0.7,
-      max_tokens: 180,
-      messages: [
-        {
-          role: "system",
-          content:
-            "Generate exactly 5 short, friendly, open-ended prompts for an anonymous messaging app. Return only one line. Separate prompts with '||'. Do not include numbering.",
-        },
-        {
-          role: "user",
-          content: "Generate prompt suggestions now.",
-        },
-      ],
-    })
+    let lastError: unknown = null
 
-    const rawText = completion.choices[0]?.message?.content || ""
-    const suggestions = rawText
-      .split("||")
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .slice(0, 5)
+    for (const currentModel of modelsToTry) {
+      try {
+        const completion = await openrouter.chat.completions.create({
+          model: currentModel,
+          temperature: 0.7,
+          max_tokens: 180,
+          messages: [
+            {
+              role: "system",
+              content:
+                "Generate exactly 5 short, friendly, open-ended prompts for an anonymous messaging app. Return only one line. Separate prompts with '||'. Do not include numbering.",
+            },
+            {
+              role: "user",
+              content: "Generate prompt suggestions now.",
+            },
+          ],
+        })
 
-    const finalSuggestions =
-      suggestions.length >= 3 ? suggestions : defaultSuggestions
+        const rawText = completion.choices[0]?.message?.content || ""
+        const suggestions = rawText
+          .split("||")
+          .map((item) => item.trim())
+          .filter(Boolean)
+          .slice(0, 5)
 
+        if (suggestions.length >= 3) {
+          return Response.json(
+            {
+              success: true,
+              message: "Suggestions generated successfully",
+              suggestions,
+            },
+            { status: 200 }
+          )
+        }
+      } catch (error) {
+        lastError = error
+        continue
+      }
+    }
+
+    console.error(
+      "OpenRouter unavailable, using default suggestions",
+      lastError
+    )
     return Response.json(
       {
         success: true,
-        message: "Suggestions generated successfully",
-        suggestions: finalSuggestions,
+        message: "Using default suggestions right now",
+        suggestions: defaultSuggestions,
       },
       { status: 200 }
     )
