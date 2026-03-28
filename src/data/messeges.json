@@ -1,0 +1,52 @@
+[
+    {
+        "tittle": "Messge from User123",
+        "content": "Hey How are youn",
+        "recived": "2 hour ago"
+    },
+    {
+        "tittle": "Message from Sarah",
+        "content": "Are we still meeting today?",
+        "recived": "5 minutes ago"
+    },
+    {
+        "tittle": "Message from Ali",
+        "content": "Send me the notes when you're free.",
+        "recived": "10 minutes ago"
+    },
+    {
+        "tittle": "Message from John",
+        "content": "I just finished the project.",
+        "recived": "30 minutes ago"
+    },
+    {
+        "tittle": "Message from Ayesha",
+        "content": "Call me when you see this.",
+        "recived": "1 hour ago"
+    },
+    {
+        "tittle": "Message from Hamza",
+        "content": "Let’s play tonight!",
+        "recived": "3 hours ago"
+    },
+    {
+        "tittle": "Message from Fatima",
+        "content": "Don’t forget the assignment deadline.",
+        "recived": "6 hours ago"
+    },
+    {
+        "tittle": "Message from Ahmed",
+        "content": "Check your email.",
+        "recived": "Yesterday"
+    },
+    {
+        "tittle": "Message from Zara",
+        "content": "That was hilarious 😂",
+        "recived": "2 days ago"
+    },
+    {
+        "tittle": "Message from Bilal",
+        "content": "Let me know when you're available.",
+        "recived": "1 week ago"
+    }
+]

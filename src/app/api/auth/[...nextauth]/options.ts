@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import UserModel from "@/models/User";
 import dbConnect from "@/lib/dbConnect";
-import { th } from "zod/locales";
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -11,37 +10,58 @@ export const authOptions: NextAuthOptions = {
             id: "credentials",
             name: "Credentials",
             credentials: {
-                email: { label: "Email", type: "text", placeholder: "Enter Your Email" },
+                identifier: {
+                    label: "Email or Username",
+                    type: "text",
+                    placeholder: "Enter your email or username",
+                },
                 password: { label: "Password", type: "password" }
             },
-            async authorize(credentials: any): Promise<any> {
+            async authorize(credentials) {
                 await dbConnect();
                 try {
+                    const identifier = credentials?.identifier
+                    const password = credentials?.password
+
+                    if (!identifier || !password) {
+                        throw new Error("Identifier and password are required");
+                    }
+
                     const user = await UserModel.findOne({
                         $or: [
-                            { email: credentials.identifier },
-                            { username: credentials.identifier }
+                            { email: identifier },
+                            { username: identifier }
                         ]
                     });
 
                     if (!user) {
-                        throw new Error("Invalid Credentials , No user found with this email");
+                        throw new Error("Invalid credentials");
                     }
 
-                    if (user.isVerified) {
+                    if (!user.isVerified) {
                         throw new Error("Please verify your account First");
                     }
 
-                    const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
+                    const isPasswordCorrect = await bcrypt.compare(password, user.password);
                     if (isPasswordCorrect) {
-                        return user;
+                        return {
+                            id: user._id.toString(),
+                            _id: user._id.toString(),
+                            email: user.email,
+                            username: user.username,
+                            isVerified: user.isVerified,
+                            isAcceptingMessege: user.isAcceptingMessege,
+                        };
                     } else {
-                        throw new Error("Invalid Credentials , Wrong Password ");
+                        throw new Error("Invalid credentials");
                     }
 
 
                 } catch (error) {
                     console.log(error)
+                    if (error instanceof Error) {
+                        throw new Error(error.message)
+                    }
                     throw new Error("Something went wrong");
                 }
             }
@@ -69,7 +89,7 @@ export const authOptions: NextAuthOptions = {
         }
     },
     pages: {
-        signIn: 'sign-in',
+        signIn: "/sign-in",
     },
     session: {
         strategy: "jwt",

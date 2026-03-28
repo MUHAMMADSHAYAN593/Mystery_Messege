@@ -1,23 +1,38 @@
-import { streamText, UIMessage, convertToModelMessages } from 'ai';
-import { ollama } from 'ollama-ai-provider-v2';
+import { generateText } from "ai"
+import { ollama } from "ollama-ai-provider-v2"
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
-    const { messages }: { messages: UIMessage[] } = await req.json();
     const prompt =
-      "Create a list of three open-ended and engaging questions formatted as a single string. Each question should be separated by '||'. These questions are for an anonymous social messaging platform, like Qooh.me, and should be suitable for a diverse audience. Avoid personal or sensitive topics, focusing instead on universal themes that encourage friendly interaction. For example, your output should be structured like this: 'What's a hobby you've recently started?||If you could have dinner with any historical figure, who would it be?|| What's a simple thing that makes you happy?'. Ensure the questions are intriguing, foster curiosity, and contribute to a positive and welcoming conversational environment.";
+      "Create exactly 5 short, open-ended, friendly anonymous message prompts. Return only one plain string where each prompt is separated by '||'. Avoid sensitive topics."
 
-    const result = streamText({
-      model: ollama('minimax-m2.5:cloud'),
-      messages: [
-        { role: 'system', content: prompt },
-        ...(await convertToModelMessages(messages)),
-      ],
-    });
+    const { text } = await generateText({
+      model: ollama("minimax-m2.5:cloud"),
+      prompt,
+    })
 
-    return result.toUIMessageStreamResponse();
+    const suggestions = text
+      .split("||")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .slice(0, 5)
+
+    return Response.json(
+      {
+        success: true,
+        message: "Suggestions generated successfully",
+        suggestions,
+      },
+      { status: 200 }
+    )
   } catch (error) {
-    console.error('Unexpected error in suggest messeges', error);
-    throw error;
+    console.error("Unexpected error in suggest messeges", error)
+    return Response.json(
+      {
+        success: false,
+        message: "Unable to generate suggestions right now",
+      },
+      { status: 500 }
+    )
   }
 }

@@ -21,7 +21,9 @@ export async function POST(req: Request) {
     }
 
     const userId = user._id
-    const { acceptMesseges } = await req.json()
+    const body = await req.json()
+    const acceptMesseges: boolean =
+        body.acceptMesseges ?? body.acceptMessages ?? false
 
     try {
         const UpdatedUser = await UserModel.findByIdAndUpdate(
@@ -63,7 +65,7 @@ export async function POST(req: Request) {
 }
 
 
-export async function GET(red: Request) {
+export async function GET() {
     await dbConnect()
 
     const session = await getServerSession(authOptions)
@@ -95,6 +97,7 @@ export async function GET(red: Request) {
         return Response.json(
             {
                 success: true,
+                message: 'Current inbox setting fetched successfully',
                 isAcceptingMessege: foundUser.isAcceptingMessege
             },
             { status: 200 }

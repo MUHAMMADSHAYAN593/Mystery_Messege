@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, IBM_Plex_Sans } from "next/font/google";
-import "./globals.css";
 import AuthProvider from "@/context/AuthProvider";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner"
+import Navbar from "@/components/Navbar";
+import './globals.css'
 
 const ibmPlexSansHeading = IBM_Plex_Sans({subsets:['latin'],variable:'--font-heading'});
 
@@ -35,6 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster />
       </body>
       </AuthProvider>
     </html>

@@ -26,24 +26,27 @@ export async function GET(request: Request) {
         }
 
         const { username } = result.data;
-        const ExistingUser = await UserModel.findOne({ username, isVerified: true })
+        const escapeRegex = (value: string) =>
+            value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const usernameRegex = new RegExp(`^${escapeRegex(username)}$`, "i");
+        const ExistingUser = await UserModel.findOne({ username: usernameRegex })
         if (ExistingUser) {
             return Response.json({
                 success: false,
-                messege: "Username already exists"
+                message: "Username already exists"
             }, { status: 400 })
         }
 
         return Response.json({
             success: true,
-            messege: "Username is Available"
+            message: "Username is available"
         }, { status: 200 })
 
     } catch (error) {
         console.log("Error in Checking username (check-UserName-route): ", error);
         return Response.json({
             success: false,
-            messege: "Error in Checking username (check-UserName-route)"
+            message: "Error in Checking username (check-UserName-route)"
         }, { status: 500 })
     }
 }

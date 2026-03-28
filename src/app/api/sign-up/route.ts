@@ -9,12 +9,14 @@ export async function POST(request: Request) {
     await dbConnect();
     try {
         const { username, email, password } = await request.json();
-        const existingUserEmailverifiedbyUsername = await UserModel.findOne({
-            username,
-            isVerified: true
+        const escapeRegex = (value: string) =>
+            value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const usernameRegex = new RegExp(`^${escapeRegex(username)}$`, "i");
+        const existingUserByUsername = await UserModel.findOne({
+            username: usernameRegex,
         })
 
-        if (existingUserEmailverifiedbyUsername) {
+        if (existingUserByUsername?.isVerified) {
             return Response.json(
                 {
                     success: false,
@@ -43,6 +45,15 @@ export async function POST(request: Request) {
                 await existingUserbyEmail.save();
             }
         } else {
+            if (existingUserByUsername && existingUserByUsername.email !== email) {
+                return Response.json(
+                    {
+                        success: false,
+                        message: "Username already exists",
+                    },
+                    { status: 400 }
+                )
+            }
             const hashedPassword = await bcrypt.hash(password, 10);
             const expiryDate = new Date();
             expiryDate.setDate(expiryDate.getDate() + 1);
