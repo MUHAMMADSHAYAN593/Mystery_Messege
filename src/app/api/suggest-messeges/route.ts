@@ -11,6 +11,8 @@ const defaultSuggestions = [
 const openrouter = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.OPENROUTER_API_KEY,
+  timeout: 7000,
+  maxRetries: 0,
   defaultHeaders: {
     "HTTP-Referer":
       process.env.NEXTAUTH_URL || "https://feedbackappnextjs-pearl.vercel.app",
@@ -32,11 +34,7 @@ export async function POST() {
 
     const model =
       process.env.OPENROUTER_MODEL || "meta-llama/llama-3.2-3b-instruct:free"
-    const fallbackModels = [
-      "mistralai/mistral-7b-instruct:free",
-      "google/gemma-2-9b-it:free",
-      "qwen/qwen-2.5-7b-instruct:free",
-    ]
+    const fallbackModels = ["mistralai/mistral-7b-instruct:free"]
     const modelsToTry = [...new Set([model, ...fallbackModels])]
 
     let lastError: unknown = null
