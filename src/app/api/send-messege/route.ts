@@ -1,14 +1,29 @@
 import UserModel from "@/models/User";
 import dbConnect from "@/lib/dbConnect";
 import { Messege } from "@/models/User";
-import { success } from "zod";
 
 
 export async function POST(request: Request) {
     await dbConnect();
     const { username, content } = await request.json();
     try {
-        const user = await UserModel.findOne({ username });
+        const cleanUsername = decodeURIComponent((username || "").trim());
+        const cleanContent = (content || "").trim();
+
+        if (!cleanUsername || !cleanContent) {
+            return Response.json(
+                {
+                    success: false,
+                    message: "Username and message content are required",
+                },
+                { status: 400 }
+            );
+        }
+
+        const escapeRegex = (value: string) =>
+            value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const usernameRegex = new RegExp(`^${escapeRegex(cleanUsername)}$`, "i");
+        const user = await UserModel.findOne({ username: usernameRegex });
         if (!user) {
             return Response.json({
                 success: false,
@@ -31,7 +46,7 @@ export async function POST(request: Request) {
         }
 
         const newMessege = {
-            content,
+            content: cleanContent,
             createdAt: new Date()
         }
 

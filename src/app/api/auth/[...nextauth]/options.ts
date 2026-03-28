@@ -20,17 +20,21 @@ export const authOptions: NextAuthOptions = {
             async authorize(credentials) {
                 await dbConnect();
                 try {
-                    const identifier = credentials?.identifier
+                    const identifier = credentials?.identifier?.trim()
                     const password = credentials?.password
 
                     if (!identifier || !password) {
                         throw new Error("Identifier and password are required");
                     }
 
+                    const escapeRegex = (value: string) =>
+                        value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                    const usernameRegex = new RegExp(`^${escapeRegex(identifier)}$`, "i");
+
                     const user = await UserModel.findOne({
                         $or: [
-                            { email: identifier },
-                            { username: identifier }
+                            { email: identifier.toLowerCase() },
+                            { username: usernameRegex }
                         ]
                     });
 

@@ -5,8 +5,23 @@ export async function POST(request: Request) {
     await dbConnect();
     try {
         const { username, code } = await request.json();
-        const decodeUsername = decodeURIComponent(username);
-        const user = await UserModel.findOne({ username: decodeUsername });
+        const decodeUsername = decodeURIComponent((username || "").trim());
+        const cleanCode = (code || "").trim();
+
+        if (!decodeUsername || !cleanCode) {
+            return Response.json(
+                {
+                    success: false,
+                    message: "Username and verification code are required",
+                },
+                { status: 400 }
+            );
+        }
+
+        const escapeRegex = (value: string) =>
+            value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const usernameRegex = new RegExp(`^${escapeRegex(decodeUsername)}$`, "i");
+        const user = await UserModel.findOne({ username: usernameRegex });
         if (!user) {
             return Response.json({
                 success: false,
@@ -25,7 +40,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const isCodeValid = user.verifyCode === code;
+        const isCodeValid = user.verifyCode === cleanCode;
         const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date();
 
         if (isCodeValid && isCodeNotExpired) {

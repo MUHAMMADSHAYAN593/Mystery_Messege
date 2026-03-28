@@ -1,6 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import User from "@/models/User";
-import { success, z } from "zod";
+import { z } from "zod";
 import { usernamevalidation } from "@/schema/signUpSchema";
 import UserModel from "@/models/User";
 
@@ -21,7 +20,7 @@ export async function GET(request: Request) {
             const usernameErrors = result.error.format().username?._errors || [];
             return Response.json({
                 success: false,
-                messege: usernameErrors?.length > 0 ? usernameErrors.join(', ') : 'Invalid username format'
+                message: usernameErrors?.length > 0 ? usernameErrors.join(', ') : 'Invalid username format'
             }, { status: 400 })
         }
 

@@ -48,7 +48,6 @@ const UserSchema: Schema<User> = new Schema({
         required: [true , "Password is required"],
         trim: true,
         minlength: [8 , "Password must be at least 8 characters"],
-        unique: [true , "Password must be unique"],
     },
     verifyCode: {
         type: String,
